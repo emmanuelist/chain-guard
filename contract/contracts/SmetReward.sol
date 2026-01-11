@@ -1,19 +1,39 @@
 // Events for critical state changes
+// Events for critical state changes
+// ---
+
+/// @notice Emitted when the contract is refilled with ERC20 tokens
 event Refilled(address indexed sender, address indexed token, uint256 amount);
+/// @notice Emitted when the fee is updated by the owner
 event FeeUpdated(uint256 newFee);
+/// @notice Emitted when the contract is paused
 event Paused(address account);
+/// @notice Emitted when the contract is unpaused
 event Unpaused(address account);
+/// @notice Emitted on emergency ERC20 withdrawal
 event EmergencyWithdraw(address indexed token, uint256 amount);
+/// @notice Emitted on emergency ERC721 withdrawal
 event EmergencyWithdrawNFT(address indexed token, uint256 tokenId);
+/// @notice Emitted on emergency ERC1155 withdrawal
 event EmergencyWithdraw1155(address indexed token, uint256 tokenId, uint256 amount);
+
+// ---
 // Custom errors for gas-efficient revert reasons
+/// @notice Sent when the fee sent is incorrect
 error InvalidFee();
+/// @notice Sent when the opener address is invalid
 error InvalidOpener();
+/// @notice Sent when a reward is already delivered
 error AlreadyDelivered();
+/// @notice Sent when an index is out of bounds
 error InvalidIndex();
+/// @notice Sent when an amount is invalid (zero or negative)
 error InvalidAmount();
+/// @notice Sent when a weight is invalid (zero or negative)
 error InvalidWeight();
+/// @notice Sent when an asset type is not supported
 error InvalidAssetType();
+/// @notice Sent when an ERC20 transfer fails
 error ERC20TransferFailed();
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.26;
