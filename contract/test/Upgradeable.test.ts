@@ -141,4 +141,30 @@ describe("Upgradeable Contracts", function () {
       await expect(implementation.initialize()).to.be.reverted;
     });
   });
+
+  describe("Upgrade Edge Cases", function () {
+    it("Should fail upgrade with incompatible contract", async function () {
+      // Deploy a contract with a different storage layout
+      const Dummy = await ethers.getContractFactory("SmetHeroUpgradeable");
+      await expect(upgrades.upgradeProxy(smetGold, Dummy)).to.be.reverted;
+    });
+
+    it("Should prevent re-initialization after upgrade", async function () {
+      const SmetGoldV2 = await ethers.getContractFactory("SmetGoldUpgradeable");
+      const upgraded = await upgrades.upgradeProxy(smetGold, SmetGoldV2);
+      await expect(upgraded.initialize()).to.be.reverted;
+    });
+
+    it("Should detect storage layout changes", async function () {
+      // Simulate by passing a different contract (already tested above), so just assert validation fails
+      const Dummy = await ethers.getContractFactory("SmetHeroUpgradeable");
+      await expect(upgrades.validateUpgrade(smetGold, Dummy)).to.be.reverted;
+    });
+
+    it("Should not allow non-owner or non-timelock to upgrade", async function () {
+      const SmetGoldV2 = await ethers.getContractFactory("SmetGoldUpgradeable");
+      // Try upgrade as a random user
+      await expect(upgrades.upgradeProxy(smetGold, SmetGoldV2.connect(user))).to.be.reverted;
+    });
+  });
 });
