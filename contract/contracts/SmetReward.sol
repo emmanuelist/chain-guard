@@ -1,3 +1,11 @@
+// Events for critical state changes
+event Refilled(address indexed sender, address indexed token, uint256 amount);
+event FeeUpdated(uint256 newFee);
+event Paused(address account);
+event Unpaused(address account);
+event EmergencyWithdraw(address indexed token, uint256 amount);
+event EmergencyWithdrawNFT(address indexed token, uint256 tokenId);
+event EmergencyWithdraw1155(address indexed token, uint256 tokenId, uint256 amount);
 // Custom errors for gas-efficient revert reasons
 error InvalidFee();
 error InvalidOpener();
@@ -217,6 +225,8 @@ contract SmetReward is
         uint256 contractBalanceBefore = token.balanceOf(address(this));
         
         token.transferFrom(msg.sender, address(this), amount);
+
+        emit Refilled(msg.sender, address(token), amount);
         
         // Record refill transaction
         transactionHistory.recordTransaction(
@@ -379,10 +389,12 @@ contract SmetReward is
 
     function pause() external onlyOwner {
         _pause();
+        emit Paused(msg.sender);
     }
 
     function unpause() external onlyOwner {
         _unpause();
+        emit Unpaused(msg.sender);
     }
 
     function emergencyWithdraw(address token, uint256 amount) external onlyOwner {
@@ -391,14 +403,17 @@ contract SmetReward is
         } else {
             IERC20(token).transfer(owner(), amount);
         }
+        emit EmergencyWithdraw(token, amount);
     }
 
     function emergencyWithdrawNFT(address token, uint256 tokenId) external onlyOwner {
         IERC721(token).safeTransferFrom(address(this), owner(), tokenId);
+        emit EmergencyWithdrawNFT(token, tokenId);
     }
 
     function emergencyWithdraw1155(address token, uint256 tokenId, uint256 amount) external onlyOwner {
         IERC1155(token).safeTransferFrom(address(this), owner(), tokenId, amount, "");
+        emit EmergencyWithdraw1155(token, tokenId, amount);
     }
 
     // ===== ADVANCED REWARD MANAGEMENT =====
