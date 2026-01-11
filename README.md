@@ -1,5 +1,26 @@
 # ChainGuard
 
+> **Note:** This repository contains both smart contracts and a Next.js frontend. See each subdirectory for detailed documentation and usage examples.
+## Features
+
+## Smart Contract Suite
+## How It Works
+
+**Reward Flow:**
+## Getting Started
+
+### Prerequisites
+### Installation
+
+### Deployment
+## Contributing
+
+## License
+## Acknowledgements
+
+---
+# ChainGuard
+
 ChainGuard is a robust, modular blockchain security and reward protocol designed for gaming ecosystems. It leverages Chainlink VRF for provably fair random rewards, advanced circuit breaker mechanisms, and a suite of upgradable smart contracts to ensure both player engagement and protocol safety.
 
 ## Features
