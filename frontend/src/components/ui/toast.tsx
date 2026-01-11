@@ -108,8 +108,8 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: string) =
           <Icon className={`h-5 w-5 flex-shrink-0 ${iconColors[toast.type]}`} />
           <div className=\"flex-1 min-w-0\">
             <h4 className=\"text-sm font-medium\">{toast.title}</h4>
-            {toast.message && (
-              <p className=\"mt-1 text-xs sm:text-sm opacity-90\">{toast.message}</p>
+            {(toast.message || toast.description) && (
+              <p className="mt-1 text-xs sm:text-sm opacity-90">{toast.message || toast.description}</p>
             )}
           </div>
           <button
