@@ -1,3 +1,12 @@
+// Custom errors for gas-efficient revert reasons
+error InvalidFee();
+error InvalidOpener();
+error AlreadyDelivered();
+error InvalidIndex();
+error InvalidAmount();
+error InvalidWeight();
+error InvalidAssetType();
+error ERC20TransferFailed();
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.26;
 
@@ -100,7 +109,7 @@ contract SmetReward is
         fee = _fee;
         // Example: weights [10, 30, 60] -> cdf [10, 40, 100]
 
-        assert(msg.value == fee);
+        if (msg.value != fee) revert InvalidFee();
 
         lastOpened[msg.sender] = block.timestamp;
         });
@@ -127,8 +136,8 @@ contract SmetReward is
     function fulfillRandomWords(uint256 reqId, uint256[] calldata rnd) internal override {
         // Map the VRF request id back to the original opener and pool
         address opener = waiting[reqId];
-        require(opener != address(0), "no opener");
-        require(!delivered[reqId], "already delivered");
+        if (opener == address(0)) revert InvalidOpener();
+        if (delivered[reqId]) revert AlreadyDelivered();
 
         // Sample from the CDF of the selected pool using the first random word.
         uint32[] storage cdf = cdfPerPool[pid];
@@ -149,7 +158,7 @@ contract SmetReward is
         }
         
         // Formal verification: Index bounds
-        assert(idx < prizePool.length);
+        if (idx >= prizePool.length) revert InvalidIndex();
 
         Reward memory rw = prizePool[idx];
         
@@ -179,12 +188,12 @@ contract SmetReward is
      */
     function _deliver(address to, Reward memory rw) private {
         // Formal verification: Pre-conditions
-        assert(to != address(0));
-        assert(rw.assetType >= 1 && rw.assetType <= 3);
+        if (to == address(0)) revert InvalidOpener();
+        if (rw.assetType < 1 || rw.assetType > 3) revert InvalidAssetType();
         
         if (rw.assetType == 1) {
             // For ERC20, transfer the specified amount (idOrAmount is used as amount)
-            require(IERC20(rw.token).transfer(to, rw.idOrAmount), "erc20 transfer failed");
+            if (!IERC20(rw.token).transfer(to, rw.idOrAmount)) revert ERC20TransferFailed();
         } else if (rw.assetType == 2) {
             // For ERC721, perform a safeTransferFrom for the provided token id
             IERC721(rw.token).safeTransferFrom(address(this), to, rw.idOrAmount);
