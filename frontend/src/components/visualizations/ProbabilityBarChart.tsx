@@ -32,7 +32,18 @@ export function ProbabilityBarChart({ data, title = "Reward Probabilities", heig
     fill: getProbabilityColor(item.probability)
   }));
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  interface CustomTooltipProps {
+    active?: boolean;
+    payload?: Array<{
+      payload: {
+        probability: number;
+        weight: number;
+      };
+    }>;
+    label?: string;
+  }
+
+  const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
